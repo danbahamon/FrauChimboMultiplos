@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2a0f5c">
+  <title>ggT-Quest</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐌</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Shared SVG symbols (kept rendered so gradients work everywhere) -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="shellG" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ff6fb5"/>
+        <stop offset="1" stop-color="#8b5cf6"/>
+      </linearGradient>
+      <linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffe680"/>
+        <stop offset="1" stop-color="#ffb347"/>
+      </linearGradient>
+    </defs>
+    <symbol id="snail" viewBox="0 0 120 90">
+      <path d="M14 80 Q4 80 8 72 Q14 64 30 64 L100 64 Q113 64 113 76 Q113 80 106 80 Z" fill="url(#bodyG)"/>
+      <rect x="89" y="40" width="24" height="36" rx="12" fill="url(#bodyG)"/>
+      <line x1="96" y1="30" x2="91" y2="12" stroke="#ffc24a" stroke-width="4" stroke-linecap="round"/>
+      <line x1="106" y1="30" x2="111" y2="12" stroke="#ffc24a" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="101" cy="40" r="14" fill="url(#bodyG)"/>
+      <circle cx="91" cy="12" r="5.5" fill="#fff"/>
+      <circle cx="111" cy="12" r="5.5" fill="#fff"/>
+      <circle cx="92" cy="13" r="2.7" fill="#1b1035"/>
+      <circle cx="112" cy="13" r="2.7" fill="#1b1035"/>
+      <circle cx="93" cy="11.7" r="1" fill="#fff"/>
+      <circle cx="113" cy="11.7" r="1" fill="#fff"/>
+      <circle cx="93" cy="45" r="3" fill="#ff7ab6" opacity=".6"/>
+      <circle cx="109" cy="45" r="3" fill="#ff7ab6" opacity=".6"/>
+      <path d="M95 46 Q101 52 107 46" fill="none" stroke="#1b1035" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="52" cy="44" r="28" fill="url(#shellG)" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+      <path d="M52 44 a4 4 0 0 1 8 0 a8 8 0 0 1 -16 0 a12 12 0 0 1 24 0 a16 16 0 0 1 -32 0 a20 20 0 0 1 40 0" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-linecap="round"/>
+      <ellipse cx="38" cy="28" rx="6" ry="3.5" fill="#fff" opacity=".35" transform="rotate(-35 38 28)"/>
+    </symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="3.5" stroke-dasharray="3.53 3.53"/>
+      <circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" stroke-width="3.2"/>
+    </symbol>
+    <symbol id="i-sound-on" viewBox="0 0 24 24">
+      <path d="M3 9h4l5-4v14l-5-4H3z" fill="currentColor"/>
+      <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-sound-off" viewBox="0 0 24 24">
+      <path d="M3 9h4l5-4v14l-5-4H3z" fill="currentColor"/>
+      <path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-back" viewBox="0 0 24 24">
+      <path d="M9 5h11a1.5 1.5 0 0 1 1.5 1.5v11A1.5 1.5 0 0 1 20 19H9l-6.5-7z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M12 9.5l5 5M17 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="M4.5 12.5l5 5L19.5 7" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.4"/>
+      <path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24">
+      <path d="M7 3.5h10v5a5 5 0 0 1-10 0z" fill="currentColor"/>
+      <path d="M7 5.5H4v1.5a3.5 3.5 0 0 0 3.5 3.5M17 5.5h3v1.5a3.5 3.5 0 0 1-3.5 3.5M12 13.5v3.5M8 20.5h8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 24 24">
+      <path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4L2.8 9.5l6.4-.8z" fill="currentColor"/>
+    </symbol>
+    <symbol id="i-retry" viewBox="0 0 24 24">
+      <path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-home" viewBox="0 0 24 24">
+      <path d="M3.5 11L12 4l8.5 7M6 9.5V20h4.5v-5h3v5H18V9.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </svg>
+
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div id="app">
+    <!-- ============ MAIN MENU ============ -->
+    <section id="screen-menu" class="screen active" aria-labelledby="title">
+      <header class="menu-top">
+        <button class="icon-btn" data-sound-toggle data-i18n-aria="sound">
+          <svg><use href="#i-sound-on"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-settings" data-i18n-aria="settings">
+          <svg><use href="#i-gear"/></svg>
+        </button>
+      </header>
+
+      <div class="menu-grid">
+        <div class="card hero">
+          <div class="hero-head">
+            <div>
+              <h1 class="title" id="title"></h1>
+              <p class="tagline" data-i18n="tagline"></p>
+            </div>
+            <svg class="snail snail-hero" aria-hidden="true"><use href="#snail"/></svg>
+          </div>
+          <p class="howto" data-i18n="howto"></p>
+
+          <div class="demo" id="demo">
+            <div class="demo-top">
+              <div class="demo-nums" id="demo-nums"></div>
+              <div class="demo-arrow">→</div>
+              <div class="demo-badge" id="demo-badge">?</div>
+            </div>
+            <div class="viz-bars demo-bars" id="demo-bars"></div>
+            <p class="demo-caption" id="demo-caption"></p>
+          </div>
+
+          <ul class="legend" id="legend">
+            <li class="lg-ok"><span class="dot"></span><span data-i18n="legendOk"></span></li>
+            <li class="lg-mid"><span class="dot"></span><span data-i18n="legendMid"></span></li>
+            <li class="lg-bad"><span class="dot"></span><span data-i18n="legendBad"></span></li>
+          </ul>
+        </div>
+
+        <div class="side">
+          <div class="card setup">
+            <h2 data-i18n="setupTitle"></h2>
+
+            <div class="slider-row" style="--a:#ff6fb5;--b:#a855f7">
+              <div class="slider-head">
+                <label for="s-count" data-i18n="count"></label>
+                <output id="v-count" class="slider-val">2</output>
+              </div>
+              <input type="range" id="s-count" class="lever" min="2" max="4" step="1" value="2">
+              <div class="slider-ticks"><span>2</span><span>3</span><span>4</span></div>
+            </div>
+
+            <div class="slider-row" style="--a:#22d3ee;--b:#3b82f6">
+              <div class="slider-head">
+                <label for="s-min" data-i18n="min"></label>
+                <output id="v-min" class="slider-val">4</output>
+              </div>
+              <input type="range" id="s-min" class="lever" min="2" max="120" step="1" value="4">
+            </div>
+
+            <div class="slider-row" style="--a:#ffd23f;--b:#ff8c42">
+              <div class="slider-head">
+                <label for="s-max" data-i18n="max"></label>
+                <output id="v-max" class="slider-val">40</output>
+              </div>
+              <input type="range" id="s-max" class="lever" min="10" max="150" step="1" value="40">
+            </div>
+
+            <div class="diff-preview">
+              <span class="range-info" id="range-info"></span>
+              <span class="diff-right">
+                <span class="stars" id="diff-stars"></span>
+                <span class="mult" id="diff-mult"></span>
+              </span>
+            </div>
+
+            <button class="btn-start" id="btn-start"><span data-i18n="start"></span></button>
+          </div>
+
+          <div class="card scores">
+            <h2><svg class="h-icon"><use href="#i-trophy"/></svg><span data-i18n="highscores"></span></h2>
+            <ol class="score-list" id="menu-scores"></ol>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ GAME ============ -->
+    <section id="screen-game" class="screen">
+      <header class="game-top">
+        <button class="icon-btn" id="btn-quit" data-i18n-aria="quit">
+          <svg><use href="#i-close"/></svg>
+        </button>
+        <div class="progress" id="progress"></div>
+        <div class="timer" id="timer-box">
+          <svg><use href="#i-clock"/></svg>
+          <span id="timer">0,000</span><small>s</small>
+        </div>
+        <button class="icon-btn" data-sound-toggle data-i18n-aria="sound">
+          <svg><use href="#i-sound-on"/></svg>
+        </button>
+      </header>
+
+      <div class="game-body">
+        <div class="stage" id="stage">
+          <div class="stage-head">
+            <span class="q-label" id="q-label"></span>
+            <span class="stars" id="q-stars"></span>
+            <span class="run-score"><svg><use href="#i-trophy"/></svg><span id="run-score">0</span></span>
+          </div>
+          <div class="prompt" data-i18n="prompt"></div>
+          <div class="orbs" id="orbs"></div>
+          <div class="answer-wrap">
+            <span class="answer-label" id="answer-label"></span>
+            <div class="answer" id="answer"><span id="answer-text"></span><span class="caret"></span></div>
+          </div>
+          <div class="hint" id="hint"></div>
+          <svg class="snail snail-game" id="game-snail" aria-hidden="true"><use href="#snail"/></svg>
+        </div>
+
+        <div class="keypad" id="keypad">
+          <button class="key" data-key="1" style="--kc:#ff6fb5">1</button>
+          <button class="key" data-key="2" style="--kc:#ff8c42">2</button>
+          <button class="key" data-key="3" style="--kc:#ffd23f">3</button>
+          <button class="key" data-key="4" style="--kc:#a3e635">4</button>
+          <button class="key" data-key="5" style="--kc:#34d399">5</button>
+          <button class="key" data-key="6" style="--kc:#22d3ee">6</button>
+          <button class="key" data-key="7" style="--kc:#60a5fa">7</button>
+          <button class="key" data-key="8" style="--kc:#a78bfa">8</button>
+          <button class="key" data-key="9" style="--kc:#f472b6">9</button>
+          <button class="key key-back" data-key="back" data-i18n-aria="back">
+            <svg><use href="#i-back"/></svg>
+          </button>
+          <button class="key" data-key="0" style="--kc:#fb7185">0</button>
+          <button class="key key-send" data-key="enter">
+            <svg><use href="#i-check"/></svg><span data-i18n="send"></span>
+          </button>
+        </div>
+
+        <div class="viz-overlay" id="viz">
+          <div class="viz-card" id="viz-card">
+            <div class="viz-top">
+              <div class="viz-badge" id="viz-badge"></div>
+              <div class="viz-text">
+                <div class="viz-verdict" id="viz-verdict"></div>
+                <div class="viz-msg" id="viz-msg"></div>
+              </div>
+            </div>
+            <div class="viz-bars" id="viz-bars"></div>
+            <div class="viz-points" id="viz-points"></div>
+            <button class="btn btn-big" id="viz-btn"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SUMMARY ============ -->
+    <section id="screen-summary" class="screen">
+      <div class="summary-wrap">
+        <div class="sum-head">
+          <svg class="snail snail-summary" aria-hidden="true"><use href="#snail"/></svg>
+          <h1 class="sum-title" data-i18n="summaryTitle"></h1>
+          <p class="sum-sub" data-i18n="summarySub"></p>
+        </div>
+
+        <div class="sum-list" id="sum-list"></div>
+
+        <div class="card total-card" id="total-card">
+          <div class="bonus-line" id="bonus-line"></div>
+          <div class="total-label" data-i18n="total"></div>
+          <div class="total-score" id="total-score">0</div>
+          <div class="total-time" id="total-time"></div>
+        </div>
+
+        <div class="sum-actions">
+          <button class="btn btn-big btn-go" id="btn-again"><svg><use href="#i-retry"/></svg><span data-i18n="playAgain"></span></button>
+          <button class="btn btn-big btn-ghost" id="btn-menu"><svg><use href="#i-home"/></svg><span data-i18n="menu"></span></button>
+        </div>
+
+        <div class="card scores">
+          <h2><svg class="h-icon"><use href="#i-trophy"/></svg><span data-i18n="highscores"></span></h2>
+          <ol class="score-list" id="sum-scores"></ol>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <canvas id="fx-canvas" aria-hidden="true"></canvas>
+
+  <!-- ============ MODALS ============ -->
+  <div class="modal" id="modal-settings" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="modal-card">
+      <h2 id="settings-title" data-i18n="settings"></h2>
+
+      <div class="set-group">
+        <div class="set-label" data-i18n="language"></div>
+        <div class="lang-grid">
+          <button class="lang-btn" data-lang="de">
+            <svg class="flag" viewBox="0 0 5 3" preserveAspectRatio="none"><rect width="5" height="1" fill="#000"/><rect y="1" width="5" height="1" fill="#dd0000"/><rect y="2" width="5" height="1" fill="#ffce00"/></svg>
+            <span>Deutsch</span>
+          </button>
+          <button class="lang-btn" data-lang="en">
+            <svg class="flag" viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice"><clipPath id="ukS"><path d="M0,0 v30 h60 v-30 z"/></clipPath><clipPath id="ukT"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath><g clip-path="url(#ukS)"><path d="M0,0 v30 h60 v-30 z" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#ukT)" stroke="#C8102E" stroke-width="4"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></g></svg>
+            <span>English</span>
+          </button>
+          <button class="lang-btn" data-lang="es">
+            <svg class="flag" viewBox="0 0 4 4" preserveAspectRatio="none"><rect width="4" height="4" fill="#c60b1e"/><rect y="1" width="4" height="2" fill="#ffc400"/></svg>
+            <span>Español</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="set-group">
+        <div class="set-label" data-i18n="sound"></div>
+        <button class="switch" id="sound-switch" role="switch" aria-checked="true">
+          <span class="switch-knob"></span>
+          <span class="switch-on" data-i18n="soundOn"></span>
+          <span class="switch-off" data-i18n="soundOff"></span>
+        </button>
+      </div>
+
+      <div class="set-group">
+        <button class="btn btn-danger" id="btn-reset" data-i18n="resetScores"></button>
+      </div>
+
+      <button class="btn btn-big btn-go" data-close data-i18n="done"></button>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-name" role="dialog" aria-modal="true" aria-labelledby="name-title">
+    <div class="modal-card name-card">
+      <div class="record-burst"><svg><use href="#i-trophy"/></svg></div>
+      <h2 id="name-title" data-i18n="newRecord"></h2>
+      <p class="name-rank" id="name-rank"></p>
+      <div class="name-score" id="name-score"></div>
+      <label class="name-label" for="name-input" data-i18n="enterName"></label>
+      <input id="name-input" class="name-input" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text">
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="btn-skip-name" data-i18n="skip"></button>
+        <button class="btn btn-go" id="btn-save-name" data-i18n="save"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-quit" role="dialog" aria-modal="true" aria-labelledby="quit-title">
+    <div class="modal-card">
+      <h2 id="quit-title" data-i18n="quitTitle"></h2>
+      <p class="modal-text" data-i18n="quitText"></p>
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="btn-quit-yes" data-i18n="quitYes"></button>
+        <button class="btn btn-go" id="btn-quit-no" data-i18n="quitNo"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/math.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/viz.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
