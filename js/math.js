@@ -8,12 +8,6 @@ const GameMath = (() => {
   };
   const gcdAll = nums => nums.reduce((a, b) => gcd(a, b));
 
-  const divisors = n => {
-    const out = [];
-    for (let i = 1; i <= n; i++) if (n % i === 0) out.push(i);
-    return out;
-  };
-
   const primeFactorCount = n => {
     let c = 0;
     for (let p = 2; p * p <= n; p++) {
@@ -61,11 +55,18 @@ const GameMath = (() => {
   }
 
   // Harder questions get more time before points decay, and a bigger multiplier.
-  function score(diff, ms, wrong) {
+  function score(diff, ms, credit) {
     const tau = 6000 + 6000 * diff;
     const timeF = tau / (tau + ms);
-    const tryF = 1 / (1 + 0.5 * wrong);
-    return Math.round(BASE_POINTS * diff * timeF * tryF);
+    return Math.round(BASE_POINTS * diff * timeF * credit);
+  }
+
+  // Full credit for the GCD. A smaller common divisor d earns d / gcd, which is
+  // at most 1/2 because d must itself divide the GCD.
+  function credit(verdict, d, g) {
+    if (verdict === 'correct') return 1;
+    if (verdict === 'partial') return d / g;
+    return 0;
   }
 
   function build(nums) {
@@ -111,5 +112,5 @@ const GameMath = (() => {
     return qs;
   }
 
-  return { gcd, gcdAll, divisors, makeRound, score, stars, previewDifficulty };
+  return { gcd, gcdAll, makeRound, score, credit, stars, previewDifficulty };
 })();

@@ -796,6 +796,7 @@ svg {
 
 .pdot.done-ok { background: var(--ok); border-color: var(--ok); color: #053b26; }
 .pdot.done-mid { background: var(--mid); border-color: var(--mid); color: #4a3300; }
+.pdot.done-bad { background: var(--bad); border-color: var(--bad); color: #fff; }
 .pdot svg { font-size: 1.1em; }
 
 @keyframes dotPulse {
@@ -818,7 +819,7 @@ svg {
 
 #timer {
   display: inline-block;
-  width: 8ch;
+  width: 9ch;
   text-align: left;
   white-space: nowrap;
 }
@@ -1009,29 +1010,6 @@ svg {
 @keyframes bump {
   50% { transform: scale(1.08); }
 }
-
-.hint {
-  max-width: 560px;
-  min-height: 0;
-  padding: 0 16px;
-  text-align: center;
-  font-size: 1rem;
-  color: var(--mid);
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.4s, transform 0.4s;
-}
-
-.hint.show {
-  opacity: 1;
-  transform: none;
-  padding: 10px 16px;
-  border-radius: 16px;
-  background: rgba(255, 210, 63, 0.12);
-  border: 1px dashed rgba(255, 210, 63, 0.5);
-}
-
-.hint:empty { display: none; }
 
 .snail-game {
   position: absolute;
@@ -1262,6 +1240,8 @@ svg {
   animation: fadeUp 0.4s both;
 }
 
+.pts-chip.mid { background: rgba(255, 210, 63, 0.2); color: var(--mid); }
+
 .pts-big {
   font-size: clamp(1.8rem, 4.6vw, 2.6rem);
   font-weight: 700;
@@ -1269,6 +1249,11 @@ svg {
   text-shadow: 0 0 24px rgba(255, 210, 63, 0.6);
   font-variant-numeric: tabular-nums;
   animation: pop 0.5s cubic-bezier(0.2, 1.8, 0.4, 1) both;
+}
+
+.pts-big.zero {
+  color: rgba(255, 255, 255, 0.4);
+  text-shadow: none;
 }
 
 #viz-btn { align-self: center; min-width: 220px; }
@@ -1559,8 +1544,20 @@ svg {
 }
 
 .meta-chip svg { color: var(--c1); }
-.meta-chip.good { color: var(--ok); }
 .meta-chip.warn { color: var(--mid); }
+
+.answer-chip {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.answer-chip.tone-ok { background: rgba(46, 229, 157, 0.2); color: var(--ok); }
+.answer-chip.tone-mid { background: rgba(255, 210, 63, 0.2); color: var(--mid); }
+.answer-chip.tone-bad { background: rgba(255, 77, 109, 0.2); color: #ff8fa3; }
+
+.sum-pts.zero { color: rgba(255, 255, 255, 0.35); }
 
 .sum-pts {
   font-size: clamp(1.35rem, 3.6vw, 2rem);

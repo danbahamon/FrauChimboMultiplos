@@ -9,7 +9,6 @@
   const MAX_DIGITS = 7;
   // Any 8 consecutive numbers contain 4 even ones, so every slider setting can produce a GCD >= 2.
   const MIN_GAP = 7;
-  const HINT_AFTER = 3;
   const PERFECT_BONUS = 0.1;
 
   I18n.setLang(Store.get('lang'));
@@ -45,7 +44,6 @@
     answer: $('#answer'),
     answerText: $('#answer-text'),
     answerLabel: $('#answer-label'),
-    hint: $('#hint'),
     snail: $('#game-snail'),
     keypad: $('#keypad'),
     viz: $('#viz'),
@@ -396,8 +394,6 @@
       idx: 0,
       results: [],
       input: '',
-      wrong: 0,
-      tries: 0,
       accum: 0,
       tStart: 0,
       running: false,
@@ -427,28 +423,25 @@
   function updateProgress() {
     $$('.pdot', els.progress).forEach((d, i) => {
       const r = game.results[i];
-      d.className = 'pdot' + (r ? (r.wrong ? ' done-mid' : ' done-ok') : i === game.idx ? ' current' : '');
-      d.innerHTML = r ? '<svg><use href="#i-check"/></svg>' : String(i + 1);
+      const tone = r && toneOf(r.verdict);
+      d.className = 'pdot' + (r ? ' done-' + tone : i === game.idx ? ' current' : '');
+      d.innerHTML = r ? `<svg><use href="${tone === 'bad' ? '#i-close' : '#i-check'}"/></svg>` : String(i + 1);
     });
   }
 
   function loadQuestion() {
     const q = current();
     game.input = '';
-    game.wrong = 0;
-    game.tries = 0;
     game.accum = 0;
     game.running = false;
     renderAnswer();
-    els.hint.textContent = '';
-    els.hint.classList.remove('show');
     els.qLabel.textContent = t('question', { n: game.idx + 1, total: ROUNDS });
     els.qStars.innerHTML = starsHTML(q.stars);
     els.orbs.classList.remove('win');
     renderOrbs(q.nums);
     updateProgress();
     setSnail(null);
-    els.timer.textContent = I18n.secs(0);
+    renderTimer(0);
     resumeTimer();
   }
 
@@ -477,7 +470,7 @@
     const id = ++game.loopId;
     const loop = () => {
       if (!game || !game.running || game.loopId !== id) return;
-      els.timer.textContent = I18n.secs(elapsed());
+      renderTimer(elapsed());
       requestAnimationFrame(loop);
     };
     requestAnimationFrame(loop);
@@ -487,7 +480,11 @@
     if (!game || !game.running) return;
     game.accum += performance.now() - game.tStart;
     game.running = false;
-    els.timer.textContent = I18n.secs(game.accum);
+    renderTimer(game.accum);
+  }
+
+  function renderTimer(ms) {
+    els.timer.innerHTML = `${I18n.secs(ms)}<small> s</small>`;
   }
 
   // input ---------------------------------------------------------
@@ -512,10 +509,6 @@
     const ov = game.overlay;
     if (ov) {
       if (key === 'enter') overlayAction();
-      else if (ov.revealed && ov.verdict !== 'correct' && /^\d$/.test(key)) {
-        overlayAction();
-        press(key);
-      }
       return;
     }
 
@@ -548,10 +541,7 @@
     const d = Number(game.input);
     pauseTimer();
     Sound.send();
-    const verdict = verdictFor(q.nums, q.gcd, d);
-    game.tries++;
-    if (verdict !== 'correct') game.wrong++;
-    openOverlay(q, d, verdict);
+    openOverlay(q, d, verdictFor(q.nums, q.gcd, d));
   }
 
   // feedback overlay ----------------------------------------------
@@ -586,17 +576,18 @@
 
   function messageFor(ov) {
     const { q, d } = ov;
+    const answer = ' ' + t('m_answer', { g: q.gcd });
     switch (ov.verdict) {
       case 'correct':
         return t('m_correct', { d, list: I18n.list(q.nums) });
       case 'partial':
-        return t('m_partial', { d });
+        return t('m_partial', { d }) + answer;
       case 'wrong': {
         const fails = q.nums.filter(n => n % d).map(n => t('m_failItem', { n, r: n % d }));
-        return t('m_wrong', { d, fails: I18n.list(fails) });
+        return t('m_wrong', { d, fails: I18n.list(fails) }) + answer;
       }
       default:
-        return d === 0 ? t('m_zero') : t('m_tooBig', { s: Math.min(...q.nums) });
+        return (d === 0 ? t('m_zero') : t('m_tooBig', { s: Math.min(...q.nums) })) + answer;
     }
   }
 
@@ -612,36 +603,40 @@
     els.vizVerdict.textContent = t('v_' + ov.verdict);
     els.vizMsg.innerHTML = messageFor(ov);
 
-    if (ov.verdict === 'correct') {
-      const q = ov.q;
-      const ms = game.accum;
-      const points = GameMath.score(q.difficulty, ms, game.wrong);
-      game.results.push({ nums: q.nums, gcd: q.gcd, stars: q.stars, ms, wrong: game.wrong, tries: game.tries, points });
+    const q = ov.q;
+    const ms = game.accum;
+    const credit = GameMath.credit(ov.verdict, ov.d, q.gcd);
+    const points = GameMath.score(q.difficulty, ms, credit);
+    game.results.push({ nums: q.nums, gcd: q.gcd, stars: q.stars, ms, answer: ov.d, verdict: ov.verdict, credit, points });
 
-      els.vizPoints.innerHTML = `
-        <span class="pts-chip"><svg><use href="#i-clock"/></svg>${I18n.secs(ms)} s</span>
-        <span class="pts-chip"><svg><use href="#i-star"/></svg>×${I18n.dec(q.difficulty, 2)}</span>
-        <span class="pts-big">+<span id="viz-pts">0</span></span>`;
+    const creditChip = ov.verdict === 'partial'
+      ? `<span class="pts-chip mid">${t('credit', { p: Math.round(credit * 100) })}</span>`
+      : '';
+    els.vizPoints.innerHTML = `
+      <span class="pts-chip"><svg><use href="#i-clock"/></svg>${I18n.secs(ms)} s</span>
+      <span class="pts-chip"><svg><use href="#i-star"/></svg>×${I18n.dec(q.difficulty, 2)}</span>
+      ${creditChip}
+      <span class="pts-big${points ? '' : ' zero'}">+<span id="viz-pts">0</span></span>`;
+    if (points) {
       countUp($('#viz-pts'), points, 900, { tick: true });
-      const runTotal = game.results.reduce((a, r) => a + r.points, 0);
-      countUp(els.runScore, runTotal, 900);
+      countUp(els.runScore, game.results.reduce((a, r) => a + r.points, 0), 900);
+    }
 
+    if (ov.verdict === 'correct') {
       Sound.correct();
       FX.fromElement(els.vizBadge, { count: 110, power: 620 });
       FX.ring(...centerOf(els.vizBadge), '#2ee59d');
       els.orbs.classList.add('win');
       setSnail('happy');
-      updateProgress();
-      els.vizBtn.innerHTML = `<span>${game.idx === ROUNDS - 1 ? t('toResults') : t('next')}</span><span class="arrow">→</span>`;
     } else {
       if (ov.verdict === 'partial') Sound.partial();
       else if (ov.verdict === 'wrong') Sound.wrong();
       else Sound.invalid();
       if (ov.verdict !== 'partial') restartAnim(els.vizCard, 'shake');
       setSnail('sad');
-      els.vizBtn.innerHTML = `<svg><use href="#i-retry"/></svg><span>${t('retry')}</span>`;
     }
-    els.vizBtn.className = 'btn btn-big ' + (ov.verdict === 'correct' ? 'btn-go' : 'btn-ghost');
+    updateProgress();
+    els.vizBtn.innerHTML = `<span>${game.idx === ROUNDS - 1 ? t('toResults') : t('next')}</span><span class="arrow">→</span>`;
     els.vizBtn.hidden = false;
   }
 
@@ -659,16 +654,9 @@
     }
     Sound.click();
     closeOverlay();
-    if (ov.verdict === 'correct') {
-      game.idx++;
-      if (game.idx >= ROUNDS) finishGame();
-      else loadQuestion();
-    } else {
-      game.input = '';
-      renderAnswer();
-      maybeHint();
-      resumeTimer();
-    }
+    game.idx++;
+    if (game.idx >= ROUNDS) finishGame();
+    else loadQuestion();
   }
 
   function closeOverlay() {
@@ -678,13 +666,6 @@
       game.overlay = null;
     }
     els.viz.classList.remove('open');
-  }
-
-  function maybeHint() {
-    if (game.wrong < HINT_AFTER) return;
-    const s = Math.min(...current().nums);
-    els.hint.innerHTML = t('hint', { s: `<b>${s}</b>`, divs: I18n.list(GameMath.divisors(s)) });
-    els.hint.classList.add('show');
   }
 
   // quitting ------------------------------------------------------
@@ -715,7 +696,7 @@
   function finishGame() {
     const results = game.results;
     const sum = results.reduce((a, r) => a + r.points, 0);
-    const perfect = results.every(r => r.wrong === 0);
+    const perfect = results.every(r => r.verdict === 'correct');
     const bonus = perfect ? Math.round(sum * PERFECT_BONUS) : 0;
     const total = sum + bonus;
     const totalMs = results.reduce((a, r) => a + r.ms, 0);
@@ -741,10 +722,11 @@
             <div class="sum-meta">
               <span class="stars">${starsHTML(r.stars)}</span>
               <span class="meta-chip"><svg><use href="#i-clock"/></svg>${I18n.secs(r.ms)} s</span>
-              <span class="meta-chip ${r.wrong ? 'warn' : 'good'}">${r.tries === 1 ? t('tryOne') : t('tryMany', { n: r.tries })}</span>
+              <span class="answer-chip tone-${toneOf(r.verdict)}">${t('r_' + r.verdict, { d: r.answer })}</span>
+              ${r.verdict === 'partial' ? `<span class="meta-chip warn">${t('credit', { p: Math.round(r.credit * 100) })}</span>` : ''}
             </div>
           </div>
-          <div class="sum-pts" data-pts="${r.points}">0</div>
+          <div class="sum-pts${r.points ? '' : ' zero'}" data-pts="${r.points}">0</div>
         </div>`)
       .join('');
 
