@@ -5,11 +5,11 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const t = I18n.t;
 
-  const ROUNDS = 5;
+  const ROUNDS = GameMath.ROUNDS;
+  const LEVELS = GameMath.LEVELS;
   const MAX_DIGITS = 7;
-  // Any 8 consecutive numbers contain 4 even ones, so every slider setting can produce a GCD >= 2.
-  const MIN_GAP = 7;
-  const PERFECT_BONUS = 0.1;
+  const TIERS = 6;
+  const LEVEL_COLORS = ['#34d399', '#22d3ee', '#a78bfa', '#ff8c42', '#ff4d6d'];
 
   I18n.setLang(Store.get('lang'));
   Sound.setEnabled(Store.get('sound'));
@@ -21,24 +21,27 @@
     demoBars: $('#demo-bars'),
     demoCaption: $('#demo-caption'),
     legend: $('#legend'),
-    sCount: $('#s-count'),
-    sMin: $('#s-min'),
-    sMax: $('#s-max'),
-    vCount: $('#v-count'),
-    vMin: $('#v-min'),
-    vMax: $('#v-max'),
-    rangeInfo: $('#range-info'),
-    diffStars: $('#diff-stars'),
-    diffMult: $('#diff-mult'),
+    lvCard: $('#level-card'),
+    lvMult: $('#lv-mult'),
+    lvPrev: $('#lv-prev'),
+    lvNext: $('#lv-next'),
+    lvShow: $('#lv-show'),
+    lvEmblem: $('#lv-emblem'),
+    lvNum: $('#lv-num'),
+    lvName: $('#lv-name'),
+    lvPips: $('#lv-pips'),
+    lvJump: $('#lv-jump'),
+    lvVars: $('#lv-vars'),
     btnStart: $('#btn-start'),
     btnSettings: $('#btn-settings'),
     menuScores: $('#menu-scores'),
+    menuLadder: $('#menu-ladder'),
 
     btnQuit: $('#btn-quit'),
     progress: $('#progress'),
     timer: $('#timer'),
     qLabel: $('#q-label'),
-    qStars: $('#q-stars'),
+    qLevel: $('#q-level'),
     runScore: $('#run-score'),
     orbs: $('#orbs'),
     answer: $('#answer'),
@@ -55,8 +58,11 @@
     vizPoints: $('#viz-points'),
     vizBtn: $('#viz-btn'),
 
+    sumLevel: $('#sum-level'),
     sumList: $('#sum-list'),
     totalCard: $('#total-card'),
+    tierBig: $('#tier-big'),
+    tierLadder: $('#tier-ladder'),
     bonusLine: $('#bonus-line'),
     totalScore: $('#total-score'),
     totalTime: $('#total-time'),
@@ -78,7 +84,7 @@
 
   let screen = 'menu';
   let game = null;
-  let settings = { count: 2, min: 4, max: 40 };
+  let level = LEVELS[0];
   let summaryTimers = [];
   let pendingScore = null;
   let lastSavedId = null;
@@ -89,7 +95,8 @@
     String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const toneOf = v => (v === 'correct' ? 'ok' : v === 'partial' ? 'mid' : 'bad');
-  const pct = inp => ((inp.value - inp.min) / (inp.max - inp.min)) * 100;
+  const levelName = lv => t('lv' + lv.id);
+  const levelColor = lv => LEVEL_COLORS[lv.id - 1];
 
   function restartAnim(el, cls) {
     el.classList.remove(cls);
@@ -97,10 +104,27 @@
     el.classList.add(cls);
   }
 
-  function starsHTML(n) {
-    let h = '';
-    for (let i = 1; i <= 5; i++) h += `<svg class="${i <= n ? 'on' : ''}"><use href="#i-star"/></svg>`;
-    return h;
+  function setLevelChip(el, lv) {
+    el.style.setProperty('--lv', levelColor(lv));
+    el.innerHTML = `<svg><use href="#lv-${lv.id}"/></svg><span>${esc(levelName(lv))}</span>`;
+  }
+
+  function tierIcon(n) {
+    if (!n) return '';
+    return `<svg class="tier-icon t${n}" role="img" aria-label="${esc(t('tierAria', { n }))}"><use href="#tier-${n}"/></svg>`;
+  }
+
+  function ladderHTML(n) {
+    return Array.from({ length: TIERS }, (_, i) => {
+      const cls = i < n ? (i === n - 1 ? ' got cur' : ' got') : '';
+      return `<span class="rung${cls}">${tierIcon(i + 1)}</span>`;
+    }).join('');
+  }
+
+  function renderCollection() {
+    const top = Store.scores()[0];
+    const best = Math.max(Number(Store.get('bestTier')) || 0, top ? GameMath.tier(top.score) : 0);
+    els.menuLadder.innerHTML = ladderHTML(best);
   }
 
   function rowLabel(row, d) {
@@ -113,13 +137,15 @@
     return d === g ? 'correct' : 'partial';
   }
 
-  function countUp(el, to, dur, { tick = false, done } = {}) {
+  function countUp(el, to, dur, { tick = false, done, onValue } = {}) {
     const start = performance.now();
     let lastTick = 0;
     const frame = now => {
       const p = Math.min(1, (now - start) / dur);
       const eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = I18n.num(Math.round(to * eased));
+      const v = Math.round(to * eased);
+      el.textContent = I18n.num(v);
+      if (onValue) onValue(v);
       if (tick && p < 1 && now - lastTick > 60) {
         Sound.count();
         lastTick = now;
@@ -160,6 +186,7 @@
     if (name === 'menu') {
       Demo.start();
       renderScores(els.menuScores, lastSavedId);
+      renderCollection();
     } else {
       Demo.stop();
     }
@@ -204,8 +231,9 @@
     $$('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === I18n.getLang()));
     renderTitle();
     els.answerLabel.textContent = t('gcd') + ' =';
-    updateSliderUI();
+    renderLevel();
     renderScores(els.menuScores, lastSavedId);
+    renderCollection();
     renderScores(els.sumScores, lastSavedId);
     Demo.restart();
   }
@@ -229,60 +257,87 @@
     if (on) Sound.click();
   }
 
-  // ---------------------------------------------------------------- sliders
+  // ---------------------------------------------------------------- difficulty levels
 
-  function initSliders() {
-    const c = clamp(Number(Store.get('count')) || 2, 2, 4);
-    const mn = clamp(Number(Store.get('min')) || 4, +els.sMin.min, +els.sMin.max);
-    const mx = clamp(Number(Store.get('max')) || 40, +els.sMax.min, +els.sMax.max);
-    els.sCount.value = c;
-    els.sMin.value = mn;
-    els.sMax.value = mx;
-    normalize('min');
-
-    [[els.sCount, 'count', els.vCount], [els.sMin, 'min', els.vMin], [els.sMax, 'max', els.vMax]].forEach(
-      ([inp, name, out]) => {
-        let lastVal = inp.value;
-        inp.addEventListener('input', () => {
-          normalize(name);
-          if (inp.value !== lastVal) {
-            lastVal = inp.value;
-            Sound.slide(pct(inp) / 100);
-            restartAnim(out, 'pop');
-          }
-        });
-        inp.addEventListener('change', persistSettings);
-      });
-  }
-
-  function normalize(changed) {
-    let mn = +els.sMin.value;
-    let mx = +els.sMax.value;
-    if (mx - mn < MIN_GAP) {
-      if (changed === 'min') mx = mn + MIN_GAP;
-      else mn = mx - MIN_GAP;
-    }
-    els.sMin.value = mn;
-    els.sMax.value = mx;
-    settings = { count: +els.sCount.value, min: +els.sMin.value, max: +els.sMax.value };
-    updateSliderUI();
-  }
-
-  function persistSettings() {
-    Store.set('count', settings.count);
-    Store.set('min', settings.min);
-    Store.set('max', settings.max);
-  }
-
-  function updateSliderUI() {
-    [[els.sCount, els.vCount], [els.sMin, els.vMin], [els.sMax, els.vMax]].forEach(([inp, out]) => {
-      inp.style.setProperty('--pct', pct(inp) + '%');
-      out.textContent = inp.value;
+  function initLevels() {
+    const saved = clamp(Math.round(Number(Store.get('level'))) || 1, 1, LEVELS.length);
+    level = LEVELS[saved - 1];
+    els.lvJump.innerHTML = LEVELS.map(lv => `
+      <button class="lv-dot" data-level="${lv.id}" style="--lv:${levelColor(lv)}">
+        <svg><use href="#lv-${lv.id}"/></svg><span>${lv.id}</span>
+      </button>`).join('');
+    els.lvPrev.addEventListener('click', () => setLevel(level.id - 1));
+    els.lvNext.addEventListener('click', () => setLevel(level.id + 1));
+    els.lvJump.addEventListener('click', e => {
+      const b = e.target.closest('.lv-dot');
+      if (b) setLevel(+b.dataset.level);
     });
-    els.rangeInfo.textContent = t('rangeInfo', { min: settings.min, max: settings.max });
-    const d = GameMath.previewDifficulty(settings.count, settings.max);
-    els.diffStars.innerHTML = starsHTML(GameMath.stars(d));
-    els.diffMult.textContent = t('multiplier', { m: I18n.dec(d, 1) });
+  }
+
+  function setLevel(id) {
+    if (id < 1 || id > LEVELS.length || id === level.id) return;
+    const dir = id > level.id ? 1 : -1;
+    level = LEVELS[id - 1];
+    Store.set('level', id);
+    Sound.tick(id * 2);
+    renderLevel(dir);
+    FX.fromElement(els.lvEmblem, { count: 10 + id * 8, power: 220 + id * 50 });
+  }
+
+  function levelVars(lv) {
+    const f = GameMath.factors(lv);
+    const largest = Math.max(...LEVELS.map(l => l.max));
+    const orbs = Array.from({ length: lv.count }, (_, i) => `<i class="c${i}"></i>`).join('');
+    return [
+      { vis: `<span class="vis-orbs">${orbs}</span>`, val: t('v_count', { c: lv.count }), exp: t('x_count'), f: f.count },
+      {
+        vis: `<span class="vis-gauge"><i style="--p:${Math.round((lv.max / largest) * 100)}%"></i></span>`,
+        val: t('v_max', { m: lv.max }),
+        exp: t('x_max'),
+        f: f.max,
+      },
+      { vis: `<span class="vis-block">${lv.low}</span>`, val: t('v_low', { l: lv.low }), exp: t('x_low'), f: f.low },
+      {
+        vis: `<span class="vis-yn ${lv.allowMin ? 'yes' : 'no'}"><svg><use href="#i-${lv.allowMin ? 'check' : 'close'}"/></svg></span>`,
+        val: t(lv.allowMin ? 'v_minYes' : 'v_minNo'),
+        exp: t('x_min'),
+        f: f.allowMin,
+      },
+    ];
+  }
+
+  function renderLevel(dir = 0) {
+    const lv = level;
+    els.lvCard.style.setProperty('--lv', levelColor(lv));
+    els.lvCard.dataset.level = lv.id;
+    els.lvEmblem.querySelector('use').setAttribute('href', '#lv-' + lv.id);
+    els.lvNum.textContent = t('levelNum', { n: lv.id });
+    els.lvName.textContent = levelName(lv);
+    els.lvPips.innerHTML = LEVELS.map(l => `<i class="${l.id <= lv.id ? 'on' : ''}"></i>`).join('');
+    els.lvMult.textContent = t('multiplier', { m: I18n.dec(GameMath.multiplier(lv), 2) });
+    els.lvPrev.disabled = lv.id === 1;
+    els.lvNext.disabled = lv.id === LEVELS.length;
+
+    $$('.lv-dot', els.lvJump).forEach(b => {
+      const id = +b.dataset.level;
+      b.classList.toggle('active', id === lv.id);
+      b.setAttribute('aria-pressed', String(id === lv.id));
+      b.setAttribute('aria-label', `${t('levelNum', { n: id })} – ${t('lv' + id)}`);
+    });
+
+    els.lvVars.innerHTML = levelVars(lv)
+      .map((v, i) => `
+        <div class="lv-var" style="--i:${i}">
+          <div class="lv-vis">${v.vis}</div>
+          <div class="lv-info"><b class="lv-val">${v.val}</b><span class="lv-exp">${v.exp}</span></div>
+          <span class="lv-fac${v.f > 1 ? ' up' : ''}">×${I18n.dec(v.f, 2)}</span>
+        </div>`)
+      .join('');
+
+    if (dir) {
+      restartAnim(els.lvShow, dir > 0 ? 'in-right' : 'in-left');
+      restartAnim(els.lvMult, 'pop');
+    }
   }
 
   // ---------------------------------------------------------------- high scores
@@ -295,11 +350,15 @@
       const li = document.createElement('li');
       li.className = 'score-row' + (s ? '' : ' empty') + (s && s.id === highlightId ? ' new' : '');
       li.style.setProperty('--i', i);
-      const meta = s && s.count ? t('metaSettings', { c: s.count, min: s.min, max: s.max }) : '';
+      const lv = s && LEVELS[s.level - 1];
+      let meta = '';
+      if (lv) meta = `<svg style="color:${levelColor(lv)}"><use href="#lv-${lv.id}"/></svg>${esc(levelName(lv))}`;
+      else if (s && s.count) meta = esc(t('metaSettings', { c: s.count, min: s.min, max: s.max }));
       li.innerHTML = `
         <span class="rank r${i + 1}">${i + 1}</span>
+        <span class="tier-slot">${s ? tierIcon(GameMath.tier(s.score)) : ''}</span>
         <span class="nm">${s ? esc(s.name) : '- - - -'}</span>
-        <span class="meta">${esc(meta)}</span>
+        <span class="meta">${meta}</span>
         <span class="pts">${s ? I18n.num(s.score) : '—'}</span>`;
       listEl.appendChild(li);
     }
@@ -387,10 +446,9 @@
   function startGame() {
     Sound.unlock();
     Sound.whoosh();
-    persistSettings();
     game = {
-      settings: { ...settings },
-      questions: GameMath.makeRound(settings.count, settings.min, settings.max, ROUNDS),
+      level,
+      questions: GameMath.makeRound(level),
       idx: 0,
       results: [],
       input: '',
@@ -401,6 +459,7 @@
       overlay: null,
     };
     show('game');
+    setLevelChip(els.qLevel, level);
     els.runScore.textContent = I18n.num(0);
     buildProgress();
     loadQuestion();
@@ -436,7 +495,6 @@
     game.running = false;
     renderAnswer();
     els.qLabel.textContent = t('question', { n: game.idx + 1, total: ROUNDS });
-    els.qStars.innerHTML = starsHTML(q.stars);
     els.orbs.classList.remove('win');
     renderOrbs(q.nums);
     updateProgress();
@@ -606,15 +664,15 @@
     const q = ov.q;
     const ms = game.accum;
     const credit = GameMath.credit(ov.verdict, ov.d, q.gcd);
-    const points = GameMath.score(q.difficulty, ms, credit);
-    game.results.push({ nums: q.nums, gcd: q.gcd, stars: q.stars, ms, answer: ov.d, verdict: ov.verdict, credit, points });
+    const points = GameMath.score(game.level, ms, credit);
+    game.results.push({ nums: q.nums, gcd: q.gcd, ms, answer: ov.d, verdict: ov.verdict, credit, points });
 
     const creditChip = ov.verdict === 'partial'
       ? `<span class="pts-chip mid">${t('credit', { p: Math.round(credit * 100) })}</span>`
       : '';
     els.vizPoints.innerHTML = `
       <span class="pts-chip"><svg><use href="#i-clock"/></svg>${I18n.secs(ms)} s</span>
-      <span class="pts-chip"><svg><use href="#i-star"/></svg>×${I18n.dec(q.difficulty, 2)}</span>
+      <span class="pts-chip"><svg><use href="#lv-${game.level.id}"/></svg>×${I18n.dec(GameMath.multiplier(game.level), 2)}</span>
       ${creditChip}
       <span class="pts-big${points ? '' : ' zero'}">+<span id="viz-pts">0</span></span>`;
     if (points) {
@@ -697,19 +755,28 @@
     const results = game.results;
     const sum = results.reduce((a, r) => a + r.points, 0);
     const perfect = results.every(r => r.verdict === 'correct');
-    const bonus = perfect ? Math.round(sum * PERFECT_BONUS) : 0;
+    const bonus = perfect ? Math.round(sum * GameMath.PERFECT_BONUS) : 0;
     const total = sum + bonus;
     const totalMs = results.reduce((a, r) => a + r.ms, 0);
-    const s = game.settings;
-    pendingScore = { score: total, count: s.count, min: s.min, max: s.max };
+    const lv = game.level;
+    pendingScore = { score: total, level: lv.id };
+    Store.set('bestTier', Math.max(Number(Store.get('bestTier')) || 0, GameMath.tier(total)));
     lastSavedId = null;
     game.running = false;
     game = null;
     show('summary');
-    renderSummary({ results, bonus, total, totalMs });
+    renderSummary({ results, bonus, total, totalMs, lv });
   }
 
-  function renderSummary({ results, bonus, total, totalMs }) {
+  function showTier(n) {
+    els.tierBig.innerHTML = tierIcon(n);
+    els.tierBig.className = 'tier-big' + (n ? ' t' + n : '');
+    if (n) restartAnim(els.tierBig, 'tier-pop');
+    els.tierLadder.innerHTML = ladderHTML(n);
+  }
+
+  function renderSummary({ results, bonus, total, totalMs, lv }) {
+    setLevelChip(els.sumLevel, lv);
     els.sumList.innerHTML = results
       .map((r, i) => `
         <div class="sum-row" style="--i:${i}">
@@ -720,7 +787,6 @@
               <span class="sum-gcd">${t('gcd')} = <b>${r.gcd}</b></span>
             </div>
             <div class="sum-meta">
-              <span class="stars">${starsHTML(r.stars)}</span>
               <span class="meta-chip"><svg><use href="#i-clock"/></svg>${I18n.secs(r.ms)} s</span>
               <span class="answer-chip tone-${toneOf(r.verdict)}">${t('r_' + r.verdict, { d: r.answer })}</span>
               ${r.verdict === 'partial' ? `<span class="meta-chip warn">${t('credit', { p: Math.round(r.credit * 100) })}</span>` : ''}
@@ -735,6 +801,7 @@
     els.totalCard.classList.remove('done');
     els.totalScore.textContent = I18n.num(0);
     els.totalTime.textContent = t('totalTime', { t: I18n.secs(totalMs) });
+    showTier(0);
     renderScores(els.sumScores);
 
     const ROW = 380;
@@ -756,13 +823,22 @@
     }
     later(at, () => {
       Sound.whoosh();
+      let shownTier = 0;
       countUp(els.totalScore, total, 1900, {
         tick: true,
+        onValue: v => {
+          const n = GameMath.tier(v);
+          if (n === shownTier || screen !== 'summary') return;
+          shownTier = n;
+          showTier(n);
+          Sound.tick(n * 2);
+        },
         done: () => {
           if (screen !== 'summary') return;
           Sound.fanfare();
           FX.rain();
           FX.fromElement(els.totalScore, { count: 140, power: 760 });
+          if (shownTier) FX.fromElement(els.tierBig, { count: 20 + shownTier * 15, power: 300 + shownTier * 60 });
           els.totalCard.classList.add('done');
           if (Store.qualifies(total)) later(1000, openNameModal);
         },
@@ -777,7 +853,7 @@
   function openNameModal() {
     if (screen !== 'summary' || !pendingScore) return;
     els.nameRank.textContent = t('rank', { r: Store.rankFor(pendingScore.score) });
-    els.nameScore.textContent = I18n.num(pendingScore.score);
+    els.nameScore.innerHTML = `${tierIcon(GameMath.tier(pendingScore.score))}<span>${I18n.num(pendingScore.score)}</span>`;
     els.nameInput.value = cleanName(Store.get('lastName') || '');
     updateNameBtn();
     openModal(els.modalName);
@@ -864,6 +940,7 @@
       Store.clearScores();
       lastSavedId = null;
       renderScores(els.menuScores);
+      renderCollection();
       renderScores(els.sumScores);
       resetArmed = false;
       els.btnReset.classList.remove('armed');
@@ -958,11 +1035,16 @@
           e.preventDefault();
           askQuit();
         }
-      } else if (screen === 'menu' && e.key === 'Enter' && !e.repeat) {
-        const tag = document.activeElement && document.activeElement.tagName;
-        if (tag !== 'BUTTON') {
+      } else if (screen === 'menu') {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
           e.preventDefault();
-          startGame();
+          setLevel(level.id + (e.key === 'ArrowRight' ? 1 : -1));
+        } else if (e.key === 'Enter' && !e.repeat) {
+          const tag = document.activeElement && document.activeElement.tagName;
+          if (tag !== 'BUTTON') {
+            e.preventDefault();
+            startGame();
+          }
         }
       }
     });
@@ -970,7 +1052,7 @@
 
   // ---------------------------------------------------------------- boot
 
-  initSliders();
+  initLevels();
   applyLang();
   updateSoundUI();
   bindEvents();

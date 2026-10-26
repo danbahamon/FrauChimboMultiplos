@@ -23,6 +23,36 @@
         <stop offset="0" stop-color="#ffe680"/>
         <stop offset="1" stop-color="#ffb347"/>
       </linearGradient>
+      <linearGradient id="r2G" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#bfdbfe"/>
+        <stop offset="1" stop-color="#3b82f6"/>
+      </linearGradient>
+      <linearGradient id="r3G" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#a7f3d0"/>
+        <stop offset="1" stop-color="#10b981"/>
+      </linearGradient>
+      <linearGradient id="r4G" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#fed7aa"/>
+        <stop offset="1" stop-color="#f97316"/>
+      </linearGradient>
+      <linearGradient id="r5G" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#f5d0fe"/>
+        <stop offset="1" stop-color="#a855f7"/>
+      </linearGradient>
+      <linearGradient id="r6G" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#fffbe0"/>
+        <stop offset=".45" stop-color="#ffd23f"/>
+        <stop offset="1" stop-color="#f59e0b"/>
+      </linearGradient>
+      <linearGradient id="flameG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#fff3a0"/>
+        <stop offset=".5" stop-color="#ff9a1f"/>
+        <stop offset="1" stop-color="#ff4d6d"/>
+      </linearGradient>
+      <radialGradient id="haloG">
+        <stop offset="0" stop-color="#ffe066" stop-opacity=".75"/>
+        <stop offset="1" stop-color="#ffe066" stop-opacity="0"/>
+      </radialGradient>
     </defs>
     <symbol id="snail" viewBox="0 0 120 90">
       <path d="M14 80 Q4 80 8 72 Q14 64 30 64 L100 64 Q113 64 113 76 Q113 80 106 80 Z" fill="url(#bodyG)"/>
@@ -82,6 +112,98 @@
     <symbol id="i-home" viewBox="0 0 24 24">
       <path d="M3.5 11L12 4l8.5 7M6 9.5V20h4.5v-5h3v5H18V9.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
     </symbol>
+    <symbol id="i-chev-left" viewBox="0 0 24 24">
+      <path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="i-chev-right" viewBox="0 0 24 24">
+      <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- difficulty level emblems -->
+    <symbol id="lv-1" viewBox="0 0 24 24">
+      <path d="M12 21.5v-9.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M12 13.5C12 8.8 8.8 6.2 3.5 6.2c0 4.7 3.3 7.3 8.5 7.3z" fill="currentColor"/>
+      <path d="M12 11.5c0-4.8 3.3-8 8.5-8 0 4.8-3.3 8-8.5 8z" fill="currentColor"/>
+    </symbol>
+    <symbol id="lv-2" viewBox="0 0 24 24">
+      <path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4L2.8 9.5l6.4-.8z" fill="currentColor"/>
+    </symbol>
+    <symbol id="lv-3" viewBox="0 0 24 24">
+      <path d="M13.8 1.8L4.2 13.6h6.6L9.4 22.2l10.4-12.6h-6.6z" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="lv-4" viewBox="0 0 24 24">
+      <path d="M2.8 8l4.7 4.4L12 4.6l4.5 7.8L21.2 8l-1.9 10H4.7z" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>
+      <rect x="4.7" y="19.2" width="14.6" height="2.4" rx="1.2" fill="currentColor"/>
+    </symbol>
+    <symbol id="lv-5" viewBox="0 0 24 24">
+      <path d="M12 1.8c.7 3.9 6.3 6.3 6.3 12.3a6.3 6.3 0 0 1-12.6 0c0-3.1 1.7-5 3.1-6.7.3 2.1 1.3 3.1 2.5 3.4C10.6 7.6 11 4.5 12 1.8z" fill="currentColor"/>
+    </symbol>
+
+    <!-- score rockets, from the most basic (1) to the best (6) -->
+    <symbol id="tier-1" viewBox="0 0 64 64">
+      <path d="M5 54q7-3 11-9" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="2 4"/>
+      <path d="M6 33L58 10 36 54l-7-15z" fill="#f1f5f9"/>
+      <path d="M29 39L58 10 23 47z" fill="#cbd5e1"/>
+      <path d="M29 39L58 10" stroke="#94a3b8" stroke-width="1.6"/>
+    </symbol>
+    <symbol id="tier-2" viewBox="0 0 64 64">
+      <g transform="rotate(40 32 32) translate(32 33) scale(.8) translate(-32 -32)">
+        <path d="M23 30l-7 12v4l7-5zM41 30l7 12v4l-7-5z" fill="#1d4ed8"/>
+        <path d="M32 6c8 7 10 18 9 35H23c-1-17 1-28 9-35z" fill="url(#r2G)"/>
+        <rect x="27" y="41" width="10" height="4" rx="1.5" fill="#475569"/>
+      </g>
+    </symbol>
+    <symbol id="tier-3" viewBox="0 0 64 64">
+      <g transform="rotate(40 32 32) translate(32 32) scale(.86) translate(-32 -32)">
+        <path d="M28 45q4 15 8 0z" fill="url(#flameG)"/>
+        <path d="M23 29l-8 13v5l8-6zM41 29l8 13v5l-8-6z" fill="#047857"/>
+        <path d="M32 6c8 7 10 18 9 35H23c-1-17 1-28 9-35z" fill="url(#r3G)"/>
+        <circle cx="32" cy="22" r="4.6" fill="#e0f2fe" stroke="#fff" stroke-width="2"/>
+        <rect x="27" y="41" width="10" height="4" rx="1.5" fill="#475569"/>
+      </g>
+    </symbol>
+    <symbol id="tier-4" viewBox="0 0 64 64">
+      <g transform="rotate(40 32 32) translate(32 31) scale(.94) translate(-32 -32)">
+        <path d="M26.5 45Q32 68 37.5 45z" fill="url(#flameG)"/>
+        <path d="M29 45q3 11 6 0z" fill="#fff7c2"/>
+        <path d="M23 27l-10 14v7l10-7zM41 27l10 14v7l-10-7z" fill="#c2410c"/>
+        <path d="M32 6c8 7 10 18 9 35H23c-1-17 1-28 9-35z" fill="url(#r4G)"/>
+        <path d="M23.3 32.5h17.4l.1 3.2H23.2z" fill="#fff" opacity=".9"/>
+        <circle cx="32" cy="21" r="5" fill="#bae6fd" stroke="#fff" stroke-width="2.2"/>
+        <rect x="26.5" y="41" width="11" height="4.5" rx="1.5" fill="#334155"/>
+      </g>
+    </symbol>
+    <symbol id="tier-5" viewBox="0 0 64 64">
+      <g transform="rotate(40 32 32) translate(32 30) scale(.98) translate(-32 -32)">
+        <path d="M20 53v8M44 53v8M32 63v3" stroke="#fff" stroke-opacity=".6" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M14.5 44q3.5 13 7 0zM42.5 44q3.5 13 7 0z" fill="url(#flameG)"/>
+        <path d="M26 45q6 25 12 0z" fill="url(#flameG)"/>
+        <path d="M28.8 45q3.2 13 6.4 0z" fill="#fff7c2"/>
+        <path d="M14 30c0-4 2-7 4-8 2 1 4 4 4 8v14h-8zM42 30c0-4 2-7 4-8 2 1 4 4 4 8v14h-8z" fill="#7e22ce"/>
+        <path d="M22 34h1.5M40.5 34H42" stroke="#7e22ce" stroke-width="3"/>
+        <path d="M32 5c8 7 10 18 9 36H23c-1-18 1-29 9-36z" fill="url(#r5G)"/>
+        <path d="M23.3 31.5h17.4l.1 3.2H23.2z" fill="#ff5fae"/>
+        <circle cx="32" cy="20" r="5" fill="#bae6fd" stroke="#fff" stroke-width="2.2"/>
+        <rect x="26.5" y="41" width="11" height="4.5" rx="1.5" fill="#334155"/>
+      </g>
+    </symbol>
+    <symbol id="tier-6" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="31" fill="url(#haloG)"/>
+      <path d="M11 6q1 5 6 6-5 1-6 6-1-5-6-6 5-1 6-6zM55 44q.8 4 4.5 4.5-3.7.5-4.5 4.5-.8-4-4.5-4.5 3.7-.5 4.5-4.5zM56 6q.6 2.8 3.2 3.2-2.6.4-3.2 3.2-.6-2.8-3.2-3.2 2.6-.4 3.2-3.2z" fill="#fff6c2"/>
+      <g transform="rotate(40 32 32) translate(32 30) scale(1) translate(-32 -32)">
+        <path d="M13.5 44q4.5 17 9 0zM41.5 44q4.5 17 9 0z" fill="url(#flameG)"/>
+        <path d="M25 45q7 30 14 0z" fill="#ff4d6d"/>
+        <path d="M26.5 45q5.5 22 11 0z" fill="url(#flameG)"/>
+        <path d="M29 45q3 13 6 0z" fill="#fff"/>
+        <path d="M13.5 30c0-4.5 2.2-7.5 4.5-9 2.3 1.5 4.5 4.5 4.5 9v14h-9zM41.5 30c0-4.5 2.2-7.5 4.5-9 2.3 1.5 4.5 4.5 4.5 9v14h-9z" fill="#d97706"/>
+        <path d="M13.5 38h9M41.5 38h9" stroke="#fff6c2" stroke-width="1.6"/>
+        <path d="M32 4c8.5 7 10.5 18.5 9.5 37h-19c-1-18.5 1-30 9.5-37z" fill="url(#r6G)"/>
+        <path d="M25 11.5h14" stroke="#ff5fae" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="32" cy="21" r="5.4" fill="#ff6fb5" stroke="#fff" stroke-width="2.4"/>
+        <path d="M32 29.5l1.5 3.1 3.4.4-2.5 2.3.6 3.4-3-1.6-3 1.6.6-3.4-2.5-2.3 3.4-.4z" fill="#fff"/>
+        <rect x="26" y="41" width="12" height="4.5" rx="1.5" fill="#7c2d12"/>
+      </g>
+    </symbol>
   </svg>
 
   <canvas id="bg-canvas" aria-hidden="true"></canvas>
@@ -89,16 +211,16 @@
   <div id="app">
     <!-- ============ MAIN MENU ============ -->
     <section id="screen-menu" class="screen active" aria-labelledby="title">
-      <header class="menu-top">
-        <button class="icon-btn" data-sound-toggle data-i18n-aria="sound">
-          <svg><use href="#i-sound-on"/></svg>
-        </button>
-        <button class="icon-btn" id="btn-settings" data-i18n-aria="settings">
-          <svg><use href="#i-gear"/></svg>
-        </button>
-      </header>
-
       <div class="menu-grid">
+        <header class="menu-top">
+          <button class="icon-btn" data-sound-toggle data-i18n-aria="sound">
+            <svg><use href="#i-sound-on"/></svg>
+          </button>
+          <button class="icon-btn" id="btn-settings" data-i18n-aria="settings">
+            <svg><use href="#i-gear"/></svg>
+          </button>
+        </header>
+
         <div class="card hero">
           <div class="hero-head">
             <div>
@@ -127,41 +249,28 @@
         </div>
 
         <div class="side">
-          <div class="card setup">
-            <h2 data-i18n="setupTitle"></h2>
+          <div class="card level-card" id="level-card">
+            <div class="lv-top">
+              <h2 data-i18n="levelTitle"></h2>
+              <span class="lv-mult" id="lv-mult"></span>
+            </div>
 
-            <div class="slider-row" style="--a:#ff6fb5;--b:#a855f7">
-              <div class="slider-head">
-                <label for="s-count" data-i18n="count"></label>
-                <output id="v-count" class="slider-val">2</output>
+            <div class="lv-picker">
+              <button class="lv-arrow" id="lv-prev" data-i18n-aria="easier"><svg><use href="#i-chev-left"/></svg></button>
+              <div class="lv-show" id="lv-show">
+                <div class="lv-emblem" id="lv-emblem"><svg><use href="#lv-1"/></svg></div>
+                <div class="lv-text">
+                  <div class="lv-num" id="lv-num"></div>
+                  <div class="lv-name" id="lv-name"></div>
+                  <div class="lv-pips" id="lv-pips"></div>
+                </div>
               </div>
-              <input type="range" id="s-count" class="lever" min="2" max="4" step="1" value="2">
-              <div class="slider-ticks"><span>2</span><span>3</span><span>4</span></div>
+              <button class="lv-arrow" id="lv-next" data-i18n-aria="harder"><svg><use href="#i-chev-right"/></svg></button>
             </div>
 
-            <div class="slider-row" style="--a:#22d3ee;--b:#3b82f6">
-              <div class="slider-head">
-                <label for="s-min" data-i18n="min"></label>
-                <output id="v-min" class="slider-val">4</output>
-              </div>
-              <input type="range" id="s-min" class="lever" min="2" max="120" step="1" value="4">
-            </div>
+            <div class="lv-jump" id="lv-jump"></div>
 
-            <div class="slider-row" style="--a:#ffd23f;--b:#ff8c42">
-              <div class="slider-head">
-                <label for="s-max" data-i18n="max"></label>
-                <output id="v-max" class="slider-val">40</output>
-              </div>
-              <input type="range" id="s-max" class="lever" min="10" max="150" step="1" value="40">
-            </div>
-
-            <div class="diff-preview">
-              <span class="range-info" id="range-info"></span>
-              <span class="diff-right">
-                <span class="stars" id="diff-stars"></span>
-                <span class="mult" id="diff-mult"></span>
-              </span>
-            </div>
+            <div class="lv-vars" id="lv-vars"></div>
 
             <button class="btn-start" id="btn-start"><span data-i18n="start"></span></button>
           </div>
@@ -169,6 +278,10 @@
           <div class="card scores">
             <h2><svg class="h-icon"><use href="#i-trophy"/></svg><span data-i18n="highscores"></span></h2>
             <ol class="score-list" id="menu-scores"></ol>
+            <div class="collection">
+              <div class="collection-label" data-i18n="rockets"></div>
+              <div class="tier-ladder" id="menu-ladder"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -194,7 +307,7 @@
         <div class="stage" id="stage">
           <div class="stage-head">
             <span class="q-label" id="q-label"></span>
-            <span class="stars" id="q-stars"></span>
+            <span class="lv-chip" id="q-level"></span>
             <span class="run-score"><svg><use href="#i-trophy"/></svg><span id="run-score">0</span></span>
           </div>
           <div class="prompt" data-i18n="prompt"></div>
@@ -245,29 +358,37 @@
     <!-- ============ SUMMARY ============ -->
     <section id="screen-summary" class="screen">
       <div class="summary-wrap">
-        <div class="sum-head">
-          <svg class="snail snail-summary" aria-hidden="true"><use href="#snail"/></svg>
-          <h1 class="sum-title" data-i18n="summaryTitle"></h1>
-          <p class="sum-sub" data-i18n="summarySub"></p>
+        <div class="sum-left">
+          <div class="sum-head">
+            <svg class="snail snail-summary" aria-hidden="true"><use href="#snail"/></svg>
+            <div>
+              <h1 class="sum-title" data-i18n="summaryTitle"></h1>
+              <p class="sum-sub"><span data-i18n="summarySub"></span><span class="lv-chip" id="sum-level"></span></p>
+            </div>
+          </div>
+          <div class="sum-list" id="sum-list"></div>
+          <div class="sum-actions">
+            <button class="btn btn-big btn-go" id="btn-again"><svg><use href="#i-retry"/></svg><span data-i18n="playAgain"></span></button>
+            <button class="btn btn-big btn-ghost" id="btn-menu"><svg><use href="#i-home"/></svg><span data-i18n="menu"></span></button>
+          </div>
         </div>
 
-        <div class="sum-list" id="sum-list"></div>
+        <div class="sum-right">
+          <div class="card total-card" id="total-card">
+            <div class="bonus-line" id="bonus-line"></div>
+            <div class="total-label" data-i18n="total"></div>
+            <div class="total-row">
+              <div class="tier-big" id="tier-big"></div>
+              <div class="total-score" id="total-score">0</div>
+            </div>
+            <div class="tier-ladder" id="tier-ladder"></div>
+            <div class="total-time" id="total-time"></div>
+          </div>
 
-        <div class="card total-card" id="total-card">
-          <div class="bonus-line" id="bonus-line"></div>
-          <div class="total-label" data-i18n="total"></div>
-          <div class="total-score" id="total-score">0</div>
-          <div class="total-time" id="total-time"></div>
-        </div>
-
-        <div class="sum-actions">
-          <button class="btn btn-big btn-go" id="btn-again"><svg><use href="#i-retry"/></svg><span data-i18n="playAgain"></span></button>
-          <button class="btn btn-big btn-ghost" id="btn-menu"><svg><use href="#i-home"/></svg><span data-i18n="menu"></span></button>
-        </div>
-
-        <div class="card scores">
-          <h2><svg class="h-icon"><use href="#i-trophy"/></svg><span data-i18n="highscores"></span></h2>
-          <ol class="score-list" id="sum-scores"></ol>
+          <div class="card scores">
+            <h2><svg class="h-icon"><use href="#i-trophy"/></svg><span data-i18n="highscores"></span></h2>
+            <ol class="score-list" id="sum-scores"></ol>
+          </div>
         </div>
       </div>
     </section>

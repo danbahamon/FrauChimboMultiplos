@@ -1,7 +1,7 @@
 const Store = (() => {
   const KEY = 'ggt-quest:v1';
   const MAX_SCORES = 5;
-  const defaults = { lang: 'de', sound: true, count: 2, min: 4, max: 40, lastName: '', scores: [] };
+  const defaults = { lang: 'de', sound: true, level: 1, lastName: '', scores: [], bestTier: 0 };
 
   let data = load();
 
@@ -52,6 +52,7 @@ const Store = (() => {
     },
     clearScores() {
       data.scores = [];
+      data.bestTier = 0;
       save();
     },
   };

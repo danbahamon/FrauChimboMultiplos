@@ -15,7 +15,7 @@ const Viz = (() => {
     const maxN = Math.max(...nums);
     const rows = nums.map((n, idx) => ({ n, idx, q: Math.floor(n / d), r: n % d }));
     const maxQ = Math.max(1, ...rows.map(r => r.q));
-    const step = Math.max(26, Math.min(170, 1300 / maxQ));
+    const step = Math.max(10, Math.min(170, 1300 / maxQ));
     let duration = 0;
     let lastRemAt = -1;
 
